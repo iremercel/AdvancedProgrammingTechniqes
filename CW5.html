@@ -1,68 +1,123 @@
 
+
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width">
-    <link rel="icon" href="https://blm-fsmvu.github.io/305/images/icon192.png">
-    <title>Classwork4</title>
-
-  <style> /* CSS comment */
+    <link rel="icon" href="/JS/images/JS.png">
+    <title>Battery Status </title>
+    
+  <style>
     body { max-width: 440px; }
-    #url { width: 190px; }
-    span, #url { color: blue; }
+    #progress { width: 200px; }
   </style>
 </head>
 
-<body>   <!-- HTML comment: Modify all items marked xxx -->
+<body>
+<h2 id=title></h2>
+<div id="charging"></div>
+<div>
+   <progress id="progress" value="0" max="100" ></progress> 
+   <span id="levelTxt" ></span>
+</div>
+<div id="message"></div>
 
-<h2 id=title title="Put your name here"></h2>
-<p title="navigator.platform">
-  Platform: <span id=plat></span>
-</p>
-<p title="Battery level (integer)">
-  Battery level: <span id=lev></span>
-</p>
-<p title="Latitude/Longitude (4 digits)">
-  Location: <span id=loc></span>
-</p>
-<p title="Does the URL exist?">
-  URL <input type=url id=url value="https://iremercel.github.io/AdvancedProgrammingTechniqes//"
-      onChange="check()"> <span id=resp></span>
-</p>
-<hr />
-<b>Sample code</b>
-<pre id=sample>This text is not shown. Why?</pre>
+<h2>Online Status</h2>
+<p id=out></p>
+<p id=online></p>
 
-<hr />
+<h2>Keyboard</h2>
+<span id="up" ></span>
+<span id="key" ></span>
 
 <script>
-"use strict";
-function init() {
-//complete the code below
-    plat.innerText = 'Windows';
-    navigator.geolocation
-      .getCurrentPosition(p =>
-        loc.innerText = p.coords.latitude.toFixed(4)+"---"+p.coords.longitude.toFixed(4)
-       );
-    navigator.getBattery().then(b =>
-        lev.innerText = '%'+(b.level)*100
-      );
-    check()
-}
-function check() {
-//complete the code below
-    fetch(url.value).then(r => 
-      resp.innerText = r.ok? 'OK' : 'URL is wrong!'
-    ).catch(e => 
-      resp.innerText = e
-    )
-}
-    title.innerText = document.title;
-    sample.innerText = init+'\n'+check;
-    init();
+  "use strict";
+  function getBatteryState(evt) {
+      let battery = evt.target;
+      let state = "", msg = "";
+      let level = Math.round(battery.level * 100);
+      if (battery.charging) { 
+         state = level==100? "Fully charged" : "Charging...";
+         if (battery.chargingTime < Infinity) {
+           let tf = getTimeFormat(battery.chargingTime);
+           msg = tf.hour + ":" + tf.minute + " to full charge";
+         }
+      } else { 
+        state = level>15? "Discharging..." : "Connect the charger"
+        if (battery.dischargingTime < Infinity) {
+          let tf = getTimeFormat(battery.dischargingTime);
+          msg = tf.hour + ":" + tf.minute + " remaining";
+         }
+      }
+      console.log(level, battery.charging, msg)
+      charging.innerText = state;
+      progress.value = level;
+      levelTxt.innerText = level + "%";
+      message.innerText = msg;
+  }
+
+  function getTimeFormat(time) {
+      let m = time / 60;
+      let hour = parseInt(m / 60);
+      let minute = parseInt(m % 60);
+      minute = minute < 10 ? "0" + minute : minute;
+      return {hour, minute};
+  }
+
+  function init(b) {
+      getBatteryState({type:'init', target:b})
+      b.onlevelchange = getBatteryState
+      b.onchargingchange = getBatteryState
+   
+  }
+  function showOnline(b) {
+    let msg
+    if (b) {
+        msg = 'connected -- online'
+        online.style.color = 'green'
+    } else {
+        msg = 'disconnected -- offline'
+        online.style.color = 'red'
+    }
+    online.innerText = msg; 
+    console.log(msg)
+  }
+
+  function keyboard(k){
+    // down
+    window.onkeydown =(e) =>{
+      if(e.altKey){
+        up.innerText="Alt";
+      }else if(e.ctrlKey){
+        up.innerText="Ctrl";
+      }else if(e.shiftKey){
+        up.innerText="Shift";
+      }
+      key.innerText=e.key;
+    };
+    // up
+    window.onkeyup=(e) =>{
+      if(!e.getModifierState("Alt") &&
+      !e.getModifierState("Control") &&
+      !e.getModifierState("Shift") ){
+        up.innerText="";
+      }
+    };
+   
+  }
+    
+    
+  title.innerText = document.title;
+  onoffline = () => showOnline(false)
+  ononline  = () => showOnline(true)
+  showOnline(navigator.onLine)
+  if (navigator.getBattery)
+      navigator.getBattery().then(init)
+  else throw "getBattery not found"
+  
+  keyboard();
 </script>
 
 </body>
 </html>
-
