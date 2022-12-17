@@ -1,0 +1,229 @@
+<html>
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width">
+      <link rel="icon" sizes="192x192" href="bmi.icon.png">
+      <title>Calculate BMI</title>
+  
+    <style>
+     
+        h1 {
+          text-align: center;
+          margin:20px;
+        }
+  
+        html, body {
+          height: 100%; 
+          width: 100%;
+          background-color: rgb(215, 221, 224);
+          color: rgb(42, 34, 163);
+        }
+  
+        body {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-family: 'Roboto', sans-serif;
+        }
+  
+        .bmi-calculator {
+          border: 5px solid white;
+          box-shadow: 0px 0px 10px  rgb(42, 34, 163);
+          padding: 32px;
+          margin: 10px;
+          height: 520px;
+          background-color: white;
+        }
+  
+        .bmi-calculator-weight, .bmi-calculator-height {
+          margin-bottom: 35px;
+          width: 100%;
+        }
+  
+        .weight-slider, .height-slider {
+          width: 100%;
+          height: 1px;
+          border-radius: 10px;
+          background:rgb(173, 175, 177);
+          
+        }
+  
+        input[type=range] {
+          appearance: none;
+          cursor: pointer;
+        }
+  
+        input[type=range]::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          border: 2px solid rgb(42, 34, 163);
+          height: 20px;
+          width: 20px;
+          border-radius: 40px;
+          background: rgb(203, 235, 166);
+          
+        }
+  
+        input[type=number] {
+          border: 0.5px solid rgb(42, 34, 163);
+          border-radius: 20px;
+          height: 40px;
+          width: 70px;
+          margin-left: 20px;
+          margin-right: 10px;
+          text-align: center;
+          font-size: 20px;
+          color: rgb(42, 34, 163);
+          background-color: rgb(215, 221, 224);
+        }
+  
+        .btn_cal {
+          text-align: center;
+          font-size: 20px;
+          color: rgb(42, 34, 163);
+          width: 100%;
+          margin-bottom: 10px;
+          padding: 10px;
+          border-radius: 20px;
+          background-color:rgb(203, 235, 166); 
+         
+        }
+        .btn_diet{
+          text-align: center;
+          font-size: 18px;
+          color: rgb(42, 34, 163);
+          width:150px;
+          height: 40px;
+          margin-bottom: 12px;
+          padding: 8px;
+          border-radius: 20px;
+          background-color:rgb(203, 235, 166);
+        }
+
+        .btn_list{
+          margin-left: 21px;
+          text-align: center;
+          font-size: 18px;
+          color: rgb(42, 34, 163);
+          width:150px;
+          height: 40px;
+          margin-bottom: 12px;
+          padding: 8px;
+          border-radius: 20px;
+          background-color:rgb(203, 235, 166);
+        }
+  
+    </style>
+  </head>
+  
+  <body>
+      <form name="bmiForm">
+          <div class="bmi-calculator">
+            <h1>Calculate your BMI</h1>
+
+            <div class="bmi-calculator-weight">
+                  <p style="margin-bottom: 18px;">
+                    Weight: 
+                    <input name="wght" id="inputWeight" type="number" min="35" max="110" value="90" oninput="show_weight(this.value)"/>
+                    <span id="weight"></span> kg
+                  </p>
+                  <input class="weight-slider" id="myWeight" type="range" min="35" max="110"/>
+            </div>
+  
+            <div class="bmi-calculator-height">
+                  <p style="margin-bottom: 18px;">
+                    Height:
+                    <input name="hght" id="inputHeight" type="number" min="135" max="200" value="183" oninput="show_height(this.value)"/>
+                    <span id="height"></span> cm
+                  </p>
+                  <input class="height-slider" id="myHeight" type="range" min="135" max="200">
+            </div>
+  
+            <input class="btn_cal" type="button" value="Calculate BMI" onclick="calculateBmi()">
+                  <p style="margin-top: 15px;">
+                    <b>BMI :</b>
+                    <span id="mybmi" style="font-size: 15px; margin-left: 8px; color: rgb(69, 61, 180); font-size: 20px;"></span>
+                  </p>
+           
+           <i><b><p style="color: rgb(182, 216, 143); font-size: 20px;">
+             <span id="evaluationMessage"></span>
+           </p></b></i>
+
+           <a href="diet.html">
+           <input type="button" class="btn_diet" value="Diet List" ></a>
+           
+           <a href="table.html">
+             <input type="button" class="btn_list" value="BMI Table" ></a>
+
+          </div>
+          </form>
+  
+  <script>
+          'use strict';
+          
+          var w_slider = document.getElementById("myWeight");
+          var h_slider = document.getElementById("myHeight");
+          var w_output = document.getElementById("inputWeight");
+          var h_output = document.getElementById("inputHeight");
+
+          w_output.innerHTML = w_slider.value;
+          h_output.innerHTML = h_slider.value;
+
+          w_slider.oninput = function () {
+            w_output.innerHTML = this.value;
+          }
+
+          h_slider.oninput = function () {
+            h_output.innerHTML = this.value;
+          }
+
+          function show_weight(newVal) {
+            w_slider.value=newVal;
+          };
+
+          function show_height(newVal) {
+            h_slider.value=newVal;
+          };
+
+          function update_weight(e) {
+            w_output.value = e.srcElement.value;
+          }
+          
+          function update_height(e) {
+            h_output.value = e.srcElement.value;
+          }
+     
+          w_slider.addEventListener("input", update_weight);
+          h_slider.addEventListener("input", update_height);
+         
+  
+          function calculateBmi() {
+            var weight = document.bmiForm.myWeight.value;
+            var height = (document.bmiForm.myHeight.value)/100;
+            var bmi = (weight) / Math.pow(height, 2);
+            var bmi_output = document.getElementById("mybmi");
+            var message_output = document.getElementById("evaluationMessage");
+            var fixed_bmi = bmi.toFixed(1);
+            
+            bmi_output.innerHTML = " " + fixed_bmi; 
+  
+
+            if(fixed_bmi<=18.5){
+              message_output.innerHTML ="Zayıf"
+            }if(fixed_bmi>=18.5 && fixed_bmi<=24.9){
+              message_output.innerHTML ="Normal Kilolu"
+            }if(fixed_bmi>=25 && fixed_bmi<=29.9){
+              message_output.innerHTML ="Fazla Kilolu"
+            }if(fixed_bmi>=30 && fixed_bmi<=34.9){
+              message_output.innerHTML ="I.Derece obez"
+            }if(fixed_bmi>=35 && fixed_bmi<=39.9){
+              message_output.innerHTML ="II.Derece obez"
+            }if(fixed_bmi>=40){
+              message_output.innerHTML ="III.Derece morbid obez"}
+
+          }
+
+  </script>
+  
+  </body>
+  </html>
+  
